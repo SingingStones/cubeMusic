@@ -107,12 +107,12 @@
             edgesS.scale.set(scale * 0.75, scale * 0.75, scale * 0.75);
             edges.scale.set(scale, scale, scale);
             
-            cube.rotation.x += rotationSpeed * scaleFactor/2, 0.01;
-            cube.rotation.y += rotationSpeed * scaleFactor/2, 0.01;
-            edges.rotation.x += rotationSpeed * scaleFactor/2, 0.01;
-            edges.rotation.y += rotationSpeed * scaleFactor/2, 0.01;
-            edgesS.rotation.x += rotationSpeed * scaleFactor/2, 0.01;
-            edgesS.rotation.y += rotationSpeed * scaleFactor/2, 0.01;
+            cube.rotation.x += rotationSpeed * scaleFactor / 8, 0.01;
+            cube.rotation.y += rotationSpeed * scaleFactor / 8, 0.01;
+            edges.rotation.x += rotationSpeed * scaleFactor / 8, 0.01;
+            edges.rotation.y += rotationSpeed * scaleFactor / 8, 0.01;
+            edgesS.rotation.x += rotationSpeed * scaleFactor / 8, 0.01;
+            edgesS.rotation.y += rotationSpeed * scaleFactor / 8, 0.01;
 
             renderer.render(scene, camera);
         }
