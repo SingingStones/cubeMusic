@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tree JS 1</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        #playButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            border: 1px solid #fff;
+            color: #fff;
+            background-color: black;
+            transition: all .3s;
+            cursor: pointer;
+        }
+        #stopButton{
+            position: absolute;
+            top: 10px;
+            left: 60px;
+            z-index: 10;
+            border: 1px solid #fff;
+            color: #fff;
+            background-color: black;
+            transition: all .3s;
+            cursor: pointer;
+        }
+        #playButton:hover,
+        #stopButton:hover{
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <button id="playButton">Play</button>
+    <button id="stopButton">Stop</button>
+    <script type="module">
+        
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three/build/three.module.js';
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        const edgesMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+        const edgesGeometry = new THREE.EdgesGeometry(geometry);
+        const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+        scene.add(edges);
+
+        const edgesSMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+        const edgesSGeometry = new THREE.EdgesGeometry(geometry);
+        const edgesS = new THREE.LineSegments(edgesSGeometry, edgesSMaterial);
+        scene.add(edgesS);
+
+        camera.position.z = 3;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 128;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        const audio = new Audio('music/kQWEpH6up0tF128.mp3');
+        audio.crossOrigin = "anonymous";
+
+        const source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        document.getElementById('playButton').addEventListener('click', function() {
+            audioContext.resume().then(() => {
+                audio.play().catch((error) => {
+                    console.error('Error playing audio:', error);
+                });
+            });
+        });
+
+        document.getElementById('stopButton').addEventListener('click', function() {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            edges.rotation.x += 0.01;
+            edges.rotation.y += 0.01;
+            edgesS.rotation.x += 0.01;
+            edgesS.rotation.y += 0.01;
+
+            analyser.getByteFrequencyData(dataArray);
+
+            const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+            const scale = 1 + average / 256;
+
+            cube.scale.set(scale * 0.75, scale * 0.75, scale * 0.75);
+            edgesS.scale.set(scale * 0.75, scale * 0.75, scale * 0.75);
+            edges.scale.set(scale, scale, scale);
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
